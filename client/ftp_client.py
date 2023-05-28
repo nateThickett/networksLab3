@@ -1,5 +1,6 @@
 import os
-os.chdir(‘myfiles’)
+import os.path
+os.chdir("myfiles")
 
 #This code was modified by the following people:
 #Austin Cash - cashau
@@ -47,19 +48,78 @@ async def send_long_message(writer: asyncio.StreamWriter, data):
     writer.write(data.encode())
 
     await writer.drain()
+    
+    
+async def send_command(writer: asyncio.StreamWriter, data):
+    # TODO: Send the length of the message: this should be 8 total hexadecimal digits
+    #       This means that ffffffff hex -> 4294967295 dec
+    #       is the maximum message length that we can send with this method!
+    #       hint: you may use the helper function `to_hex`. Don't forget to encode before sending!
+    
+    
+
+    
+
+    writer.write(to_hex(len(data)).encode())
+    writer.write(data.encode())
+
+    await writer.drain()
+    
+    
+def get_command_input():
+    while(True):
+        print("Command options are 1: list, 2: put, 3: get, 4: remove, 5: close\n")
+        command = input("Please enter a command to send to the server from those 5: ")
+        if command == "list":
+            return 0
+        elif command == "put":
+            file = input("Please enter the name of the file you wish to send to the server: ")
+            if os.path.exists("./" + file):
+                print("file exists")
+                return (command + " " + file)
+            else:
+                print("File entered is not valid. Please provide a valid filename.\n")
+        elif command == "get":
+            return 0
+        elif command == "remove":
+            return 0
+        elif command == "close":
+            return 0
+        else:
+            print("\nCommand entered is invalid. Please enter a valid command from the 5 listed.\n")
+            
 
 
-async def connect(i):
+async def connect():
     reader, writer = await asyncio.open_connection(IP, DPORT)
+    intro = ""
+    
+    while(intro != "Password entered successfully\n" and intro != "Close Server\n"):
 
-    intro = await recv_intro_message(reader)
-    print(intro)
+        intro = await recv_intro_message(reader)
+    
 
-    long_msg = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" * 100 + f"  CLIENT: " + str(i)
+        long_msg = input(intro)
 
-    await send_long_message(writer, long_msg)
+        await send_long_message(writer, long_msg)
+        
+        intro = await recv_intro_message(reader)
 
-    print("Done sending", i)
+        print(intro)
+        
+        
+    if intro != "Close Server\n":
+        
+        intro = await recv_intro_message(reader)
+        
+        command = get_command_input()
+        
+        await send_command(writer, command)
+    
+    
+    
+    
+    
 
 
     return 0
@@ -80,10 +140,8 @@ def inputNumber(message):
 async def main():
     tasks = []
     
-    x = inputNumber("Enter number of connections to open: ")
     
-    for i in range(x):
-        tasks.append(connect(i))
+    tasks.append(connect())
 
     await asyncio.gather(*tasks)
     print("done")
