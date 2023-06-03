@@ -86,7 +86,7 @@ def get_command_input():
         elif command[0] == "remove":
             return 0
         elif command[0] == "close":
-            return 0
+            return "close"
         else:
             print("\nCommand entered is invalid. Please enter a valid command from the 5 listed.\n")
             
@@ -110,13 +110,25 @@ async def connect():
         print(intro)
         
         
-    if intro != "Close Server\n":
+    while intro != "Close Server\n":
         
         intro = await recv_intro_message(reader)
+        
+        print(intro)
         
         command = get_command_input()
         
         await send_command(writer, command)
+        
+        intro = await recv_intro_message(reader)
+        
+        print(intro)
+        if intro == "ACK Received CLOSE command\n":
+            return 0
+        
+        
+        
+        
     
     
     

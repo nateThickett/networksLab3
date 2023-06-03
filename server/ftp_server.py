@@ -98,11 +98,30 @@ async def receive_command(reader: asyncio.StreamReader):
     return full_data.decode()
 
 async def handle_commands(reader, writer):
-    await send_general(writer, "Please enter a command: \n")
     
-    command = await receive_command(reader)
     
-    print(command)
+    
+    
+    while(True):
+        
+        await send_general(writer, "Please enter a command: \n")
+        command = await receive_command(reader)
+        
+        command = command.split()
+        if command[0] == "list":
+            await send_general(writer, "ACK Received LIST command\n")
+        elif command[0] == "put":
+            await send_general(writer, "ACK Received PUT command\n")
+        elif command[0] == "get":
+            await send_general(writer, "ACK Received GET command\n")
+        elif command[0] == "remove":
+            await send_general(writer, "ACK Received REMOVE command\n")
+        elif command[0] == "close":
+            await send_general(writer, "ACK Received CLOSE command\n")
+            return 0
+        else:
+            await send_general(writer, "NAK Entered Command is not valid\n")
+            
     
     return 0
     
