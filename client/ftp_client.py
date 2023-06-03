@@ -69,21 +69,23 @@ async def send_command(writer: asyncio.StreamWriter, data):
 def get_command_input():
     while(True):
         print("Command options are 1: list, 2: put, 3: get, 4: remove, 5: close\n")
+        print("For commands involving file manipulation, please enter the command followed by a space, followed by the filename\n")
         command = input("Please enter a command to send to the server from those 5: ")
-        if command == "list":
+        command = command.split()
+        if command[0] == "list":
             return 0
-        elif command == "put":
-            file = input("Please enter the name of the file you wish to send to the server: ")
+        elif command[0] == "put":
+            file = command[1]
             if os.path.exists("./" + file):
                 print("file exists")
-                return (command + " " + file)
+                return (command[0] + " " + file)
             else:
                 print("File entered is not valid. Please provide a valid filename.\n")
-        elif command == "get":
+        elif command[0] == "get":
             return 0
-        elif command == "remove":
+        elif command[0] == "remove":
             return 0
-        elif command == "close":
+        elif command[0] == "close":
             return 0
         else:
             print("\nCommand entered is invalid. Please enter a valid command from the 5 listed.\n")
@@ -94,7 +96,7 @@ async def connect():
     reader, writer = await asyncio.open_connection(IP, DPORT)
     intro = ""
     
-    while(intro != "Password entered successfully\n" and intro != "Close Server\n"):
+    while(intro != "ACK Password entered successfully\n" and intro != "Close Server\n"):
 
         intro = await recv_intro_message(reader)
     

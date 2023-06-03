@@ -30,7 +30,7 @@ async def send_intro_message(writer):
 async def send_pw_confirmation(writer):
     # TODO: Replace {ONID} with your ONID (mine is lyakhovs)
     #       and {MAJOR} with your major (i.e. CS, ECE, any others?)
-    intro_message = "Password entered successfully\n"
+    intro_message = "ACK Password entered successfully\n"
 
     # TODO: Send this intro message to the client. Don't forget to encode() it!
     #       hint: use the `conn` handle and `sendall`!
@@ -40,7 +40,7 @@ async def send_pw_confirmation(writer):
 async def send_pw_declination(writer):
     # TODO: Replace {ONID} with your ONID (mine is lyakhovs)
     #       and {MAJOR} with your major (i.e. CS, ECE, any others?)
-    intro_message = "Password entered incorrect\n"
+    intro_message = "NAK Password entered incorrect\n"
 
     # TODO: Send this intro message to the client. Don't forget to encode() it!
     #       hint: use the `conn` handle and `sendall`!
