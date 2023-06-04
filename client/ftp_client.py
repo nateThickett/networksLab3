@@ -74,19 +74,25 @@ def get_command_input():
         command = command.split()
         if command[0] == "list":
             return 0
+        
         elif command[0] == "put":
             file = command[1]
             if os.path.exists("./" + file):
-                print("file exists")
-                return (command[0] + " " + file)
+                with open(file, 'rb') as f:
+                    fcontent = f.read()
+                return (command[0] + " " + file, fcontent)
             else:
                 print("File entered is not valid. Please provide a valid filename.\n")
+
         elif command[0] == "get":
             return 0
+        
         elif command[0] == "remove":
             return 0
+        
         elif command[0] == "close":
             return "close"
+        
         else:
             print("\nCommand entered is invalid. Please enter a valid command from the 5 listed.\n")
             
@@ -96,7 +102,7 @@ async def connect():
     reader, writer = await asyncio.open_connection(IP, DPORT)
     intro = ""
     
-    while(intro != "ACK Password entered successfully\n" and intro != "Close Server\n"):
+    while intro != "ACK Password entered successfully\n" and intro != "Close Server\n":
 
         intro = await recv_intro_message(reader)
     
@@ -117,26 +123,21 @@ async def connect():
         print(intro)
         
         command = get_command_input()
-        
-        await send_command(writer, command)
+
+        if isinstance(command, tuple):
+            command, fcontent = command
+            await send_command(writer, command)
+            await send_long_message(writer, fcontent)
+        else:
+            await send_command(writer, command)
         
         intro = await recv_intro_message(reader)
         
         print(intro)
         if intro == "ACK Received CLOSE command\n":
-            return 0
-        
-        
-        
-        
-    
-    
-    
-    
-    
+            return
 
-
-    return 0
+    return
 
 
 def inputNumber(message):
@@ -148,19 +149,18 @@ def inputNumber(message):
        continue
     else:
        return userInput 
-       break
+
    
 
 async def main():
     tasks = []
     
-    
     tasks.append(connect())
-
     await asyncio.gather(*tasks)
     print("done")
+
+
 
 # Run the `main()` function
 if __name__ == "__main__":
     asyncio.run(main())
-
