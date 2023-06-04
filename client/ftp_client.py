@@ -73,7 +73,7 @@ def get_command_input():
         command = input("Please enter a command to send to the server from those 5: ")
         command = command.split()
         if command[0] == "list":
-            return 0
+            return "list"
         
         elif command[0] == "put":
             file = command[1]
@@ -85,10 +85,10 @@ def get_command_input():
                 print("File entered is not valid. Please provide a valid filename.\n")
 
         elif command[0] == "get":
-            return 0
+            return "get"
         
         elif command[0] == "remove":
-            return 0
+            return "remove"
         
         elif command[0] == "close":
             return "close"

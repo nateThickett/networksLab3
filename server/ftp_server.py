@@ -106,6 +106,7 @@ async def handle_commands(reader, writer):
                 await remove_file(writer, command[1])
             else:
                 await send_general(writer, "NAK No file specified\n")
+  
         elif command[0] == "close":
             await send_general(writer, "ACK Received CLOSE command\n")
             return 0
