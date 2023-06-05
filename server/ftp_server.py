@@ -29,7 +29,7 @@ def to_hex(number):
 
 
 async def send_intro_message(writer):
-    intro_message = "Please enter the password for the server: \n"
+    intro_message = "Welcome to the ftp server! Please enter the password for the server: \n"
 
     writer.write(intro_message.encode())
     await writer.drain()
