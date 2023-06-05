@@ -90,7 +90,7 @@ def get_command_input():
             return "get", command[1]
         
         elif command[0] == "remove":
-            return "remove"
+            return(command[0] + " " + command[1])
         
         elif command[0] == "close":
             return "close"
@@ -118,7 +118,7 @@ async def connect():
         print(intro)
         
         
-    while intro != "Close Server\n":
+    while intro != "ACK Received CLOSE command\n":
         
         intro = await recv_intro_message(reader)
         
@@ -135,6 +135,10 @@ async def connect():
         
         intro = await recv_intro_message(reader)
         print(intro)
+        
+        if intro == "ACK Received CLOSE command\n":
+            print("closing")
+            break
 
         if intro == "ACK Received GET command\n":
             fsize_hx = await reader.readexactly(8)
@@ -148,8 +152,7 @@ async def connect():
 
         
         
-        if intro == "ACK Received CLOSE command\n":
-            return
+        
 
     return
 

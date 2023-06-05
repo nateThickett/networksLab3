@@ -119,7 +119,6 @@ async def handle_commands(reader, writer):
 
 
         if command[0] == "list":
-            await send_general(writer, "ACK Received LIST command\n")
             await list_files(writer)
 
         elif command[0] == "put":
@@ -143,7 +142,7 @@ async def handle_commands(reader, writer):
   
         elif command[0] == "close":
             await send_general(writer, "ACK Received CLOSE command\n")
-            return 0
+            return
     
         else:
             await send_general(writer, "NAK Entered Command is not valid\n")
