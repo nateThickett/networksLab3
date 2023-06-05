@@ -1,11 +1,13 @@
+#This code was modified and created by the following people:
+#Austin Cash - cashau  -  932-538-892
+#Nathaniel Thickett - thicketn  -  933969798
+#Robert Lucas - Lucasrob  -  934293987
+
 import os
 import os.path
 os.chdir("myfiles")
 
-#This code was modified by the following people:
-#Austin Cash - cashau
-#Nathaniel Thickett - thicketn
-#Robert Lucas - Lucasrob
+
 
 
 import socket
@@ -22,26 +24,15 @@ def to_hex(number):
     assert number <= 0xffffffff, "Number too large"
     return "{:08x}".format(number)
 
-##################################
-# TODO: Implement me for Part 1! #
-##################################
+
 async def recv_intro_message(reader: asyncio.StreamReader):
     
     full_data = await reader.readline()
     return full_data.decode()
     
 
-
-##################################
-# TODO: Implement me for Part 2! #
-##################################
 async def send_long_message(writer: asyncio.StreamWriter, data):
-    # TODO: Send the length of the message: this should be 8 total hexadecimal digits
-    #       This means that ffffffff hex -> 4294967295 dec
-    #       is the maximum message length that we can send with this method!
-    #       hint: you may use the helper function `to_hex`. Don't forget to encode before sending!
-
-    # Add a delay to simulate network latency
+  
     await asyncio.sleep(1)
 
     writer.write(to_hex(len(data)).encode())
@@ -50,15 +41,7 @@ async def send_long_message(writer: asyncio.StreamWriter, data):
     await writer.drain()
     
     
-async def send_command(writer: asyncio.StreamWriter, data):
-    # TODO: Send the length of the message: this should be 8 total hexadecimal digits
-    #       This means that ffffffff hex -> 4294967295 dec
-    #       is the maximum message length that we can send with this method!
-    #       hint: you may use the helper function `to_hex`. Don't forget to encode before sending!
-    
-    
-
-    
+async def send_command(writer: asyncio.StreamWriter, data):    
 
     writer.write(to_hex(len(data)).encode())
     writer.write(data.encode())
@@ -75,8 +58,6 @@ async def put(reader, writer, filename):
         
         writer.write(to_hex(file_data_length).encode())
         await writer.drain()
-
-        await receive_long_message(reader)
 
         await send_general(writer, file_data)
 
@@ -136,7 +117,7 @@ async def connect():
         print(intro)
         
         
-    while intro != "ACK Received CLOSE command\n":
+    while intro != "Close Server\n":
         
         intro = await recv_intro_message(reader)
         
@@ -154,7 +135,7 @@ async def connect():
         intro = await recv_intro_message(reader)
         print(intro)
         
-        if intro == "ACK Received CLOSE command\n":
+        if intro == "ACK Received CLOSE command\n" or intro == "Close Server\n":
             print("closing")
             break
 
@@ -174,7 +155,9 @@ async def connect():
 
         
         
-        
+    
+    writer.close()
+    await writer.wait_closed()
 
     return
 

@@ -1,10 +1,10 @@
+#This code was modified and created by the following people:
+#Austin Cash - cashau  -  932-538-892
+#Nathaniel Thickett - thicketn  -  933969798
+#Robert Lucas - Lucasrob  -  934293987
+
 import os
 os.chdir("myfiles")
-
-#This code was modified by the following people:
-#Austin Cash - cashau
-#Nathaniel Thickett - thicketn
-#Robert Lucas - Lucasrob
 
 
 import socket
