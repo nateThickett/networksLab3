@@ -14,6 +14,19 @@ INTERFACE, SPORT = 'localhost', 8080
 CHUNK = 100
 
 
+async def send_long_message(writer: asyncio.StreamWriter, data):
+    writer.write(to_hex(len(data)).encode())
+    writer.write(data.encode())
+
+    await writer.drain()
+
+
+
+def to_hex(number):
+    assert number <= 0xffffffff, "Number too large"
+    return "{:08x}".format(number)
+
+
 
 async def send_intro_message(writer):
     intro_message = "Please enter the password for the server: \n"
@@ -72,6 +85,30 @@ async def receive_command(reader: asyncio.StreamReader):
 
 
 
+async def get(reader, writer, filename):
+
+    await send_general(writer, "ACK Received GET command\n")
+
+    try:
+        with open(filename, 'r') as file:
+            file_data = file.read()
+        file_data_length = len(file_data)
+        
+        writer.write(to_hex(file_data_length).encode())
+        await writer.drain()
+
+        await receive_long_message(reader)
+
+        await send_general(writer, file_data)
+
+        await send_general(writer, "File {} sent successfully\n".format(filename))
+
+    except FileNotFoundError:
+        await send_general(writer, "File not found\n")
+
+
+
+
 async def handle_commands(reader, writer):
     
     while(True):
@@ -93,13 +130,10 @@ async def handle_commands(reader, writer):
                 file.write(fcontent)
 
         elif command[0] == "get":
-            await send_general(writer, "ACK Received GET command\n")
-            fname = command[1]
-            try:
-                with open(fname, 'rb') as file:
-                    await send_general(writer, fcontent)
-            except FileNotFoundError:
-                await send_general(writer, "NAK FILE NOT FOUND\n")
+            fname = await receive_command(reader)
+            await get(reader, writer, fname)
+
+                
 
         elif command[0] == "remove":
             if len(command) > 1:
