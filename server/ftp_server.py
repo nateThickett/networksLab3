@@ -123,9 +123,9 @@ async def handle_commands(reader, writer):
 
         elif command[0] == "put":
             await send_general(writer, "ACK Received PUT command\n")
-            fname = await receive_command(reader)
+            fname = command[1]
             fcontent = await receive_long_message(reader)
-            with open(fname, 'wb') as file:
+            with open(fname, 'w') as file:
                 file.write(fcontent)
 
         elif command[0] == "get":

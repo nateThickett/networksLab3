@@ -66,6 +66,25 @@ async def send_command(writer: asyncio.StreamWriter, data):
     await writer.drain()
     
     
+async def put(reader, writer, filename):
+
+    try:
+        with open(filename, 'r') as file:
+            file_data = file.read()
+        file_data_length = len(file_data)
+        
+        writer.write(to_hex(file_data_length).encode())
+        await writer.drain()
+
+        await receive_long_message(reader)
+
+        await send_general(writer, file_data)
+
+        await send_general(writer, "File {} sent successfully\n".format(filename))
+
+    except FileNotFoundError:
+        await send_general(writer, "File not found\n")    
+    
 def get_command_input():
     
     while(True):
@@ -80,9 +99,8 @@ def get_command_input():
         elif command[0] == "put":
             file = command[1]
             if os.path.exists("./" + file):
-                with open(file, 'rb') as f:
-                    fcontent = f.read()
-                return (command[0] + " " + file, fcontent)
+                print("correct")
+                return (command[0] + " " + file)
             else:
                 print("File entered is not valid. Please provide a valid filename.\n")
 
@@ -149,12 +167,38 @@ async def connect():
                 f.write(file_data)
             response = await reader.readline()
             print(response.decode())
+            
+        if intro == "ACK Received PUT command\n":
+            command = command.split()
+            await put(reader, writer, command[1])
 
         
         
         
 
     return
+
+async def send_general(writer, message):
+    writer.write(message.encode())
+    await writer.drain()
+
+async def put(reader, writer, filename):
+    filename = "./" + filename
+    
+    print(filename)
+    try:
+        with open(filename, 'r') as file:
+            file_data = file.read()
+        file_data_length = len(file_data)
+        
+        writer.write(to_hex(file_data_length).encode())
+        await writer.drain()
+
+        await send_general(writer, file_data)
+
+
+    except FileNotFoundError:
+        print("file not found")
 
 
 def inputNumber(message):
